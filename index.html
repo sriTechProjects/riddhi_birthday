@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>The Messages — A Beautiful Story</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+
+      /* --- "Midnight Forest" Dark Theme --- */
+      :root {
+        --bg-primary: #0f172a; /* Dark Slate */
+        --bg-secondary: #1e293b; /* Medium Slate */
+        --text-primary: #f1f5f9; /* Light Slate (Off-white) */
+        --text-secondary: #94a3b8; /* Medium Slate */
+        --text-muted: #64748b; /* Darker Slate */
+        --accent-primary: #10b981; /* Emerald Green */
+        --accent-secondary: #f59e0b; /* Amber Gold */
+        --accent-tertiary: #38bdf8; /* Sky Blue (for contrast) */
+        --accent-error: #f43f5e; /* Rose Red (for errors) */
+        --glass-light: rgba(241, 245, 249, 0.08); /* Light Slate Glass */
+        --glass-medium: rgba(241, 245, 249, 0.12);
+        --glass-strong: rgba(241, 245, 249, 0.18);
+        --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.15);
+        --shadow-medium: 0 10px 40px rgba(0, 0, 0, 0.25);
+        --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.4);
+        --radius-md: 16px;
+        --radius-lg: 24px;
+        --radius-xl: 32px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden; /* Hide scrollbars */
+      }
+      body {
+        margin: 0;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui,
+          sans-serif;
+        color: var(--text-primary);
+        /* New Background Gradient */
+        background: linear-gradient(
+          135deg,
+          var(--bg-primary) 0%,
+          var(--bg-secondary) 100%
+        );
+        background-attachment: fixed;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .floating-orb {
+          display: none;
+        }
+      }
+
+      /* Main stage */
+      .stage {
+        position: relative;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center; /* Center the content */
+        padding: 24px;
+        gap: 16px;
+        z-index: 2; /* Sit above the orbs */
+      }
+
+      h1 {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(32px, 6vw, 56px);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        /* New Gradient Text */
+        background: linear-gradient(
+          90deg,
+          var(--text-primary) 0%,
+          var(--accent-primary) 60%,
+          var(--accent-secondary) 100%
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+        z-index: 10;
+        padding-bottom: 8px;
+      }
+
+      /* --- FLOATING ORBS DECORATION (New Colors) --- */
+      @keyframes float-orb {
+        0%,
+        100% {
+          transform: translateY(0px) translateX(0px);
+        }
+        50% {
+          transform: translateY(-30px) translateX(20px);
+        }
+      }
+      .floating-orbs {
+        position: fixed;
+        inset: 0;
+        z-index: 1; /* Behind the stage content */
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .floating-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.5;
+        animation: float-orb 15s infinite alternate ease-in-out;
+      }
+      .orb-1 {
+        width: 300px;
+        height: 300px;
+        top: 10%;
+        left: 5%;
+        background: var(--accent-primary); /* Green */
+        opacity: 0.3;
+        animation-duration: 12s;
+      }
+      .orb-2 {
+        width: 400px;
+        height: 400px;
+        top: 60%;
+        left: 30%;
+        background: var(--accent-secondary); /* Gold */
+        opacity: 0.2;
+        animation-duration: 18s;
+        animation-delay: -5s;
+      }
+      .orb-3 {
+        width: 250px;
+        height: 250px;
+        top: 30%;
+        right: 10%;
+        background: var(--accent-tertiary); /* Blue */
+        opacity: 0.25;
+        animation-duration: 14s;
+        animation-delay: -2s;
+      }
+      /* --- END DECORATION --- */
+
+      /* --- SUBTITLE & SUB-HEADING --- */
+      .subtitle {
+        font-size: clamp(16px, 3vw, 20px);
+        font-weight: 400;
+        color: var(--text-secondary);
+        text-align: center;
+        margin: -8px 0 0 0;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      }
+      .sub-heading {
+        font-size: clamp(20px, 4vw, 24px);
+        font-weight: 600;
+        color: var(--text-primary);
+        text-align: center;
+        margin: 24px 0 0 0;
+      }
+      /* --- END: NEW TEXT --- */
+
+      /* Enhanced CTA button */
+      .cta-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        margin-top: 8px;
+      }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 16px 32px;
+        border-radius: 999px;
+        /* New Button Gradient */
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary) 0%,
+          var(--accent-secondary) 100%
+        );
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: -0.01em;
+        border: none;
+        cursor: pointer;
+        box-shadow: var(--shadow-medium), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      .cta::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.2) 0%,
+          transparent 50%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .cta:hover {
+        transform: translateY(-4px) scale(1.05);
+        /* New Hover Shadow */
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+      .cta:hover::before {
+        opacity: 1;
+      }
+      .cta:focus-visible {
+        outline: 3px solid var(--accent-tertiary);
+        outline-offset: 4px;
+      }
+
+      /* SECRET GREET BUTTON STYLE (New Theme) */
+      .cta.secondary {
+        background: var(--glass-light);
+        border: 2px solid var(--accent-tertiary);
+        color: var(--accent-tertiary);
+      }
+      .cta.secondary:hover {
+        background: rgba(56, 189, 248, 0.2);
+        border-color: var(--accent-tertiary);
+        color: #fff;
+        box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3);
+      }
+
+      /* Enhanced lightbox (New Dark Theme) */
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.85); /* Dark Slate overlay */
+        backdrop-filter: blur(12px);
+        display: none;
+        place-items: center;
+        z-index: 100;
+        padding: 24px;
+      }
+      .lightbox.visible {
+        display: grid;
+      }
+      .storybook {
+        position: relative;
+        width: min(600px, 95vw);
+        max-height: 90vh;
+        background: var(--glass-light);
+        border: 2px solid var(--glass-strong);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr;
+        box-shadow: var(--shadow-strong);
+        backdrop-filter: blur(20px);
+      }
+      .sb-msg {
+        padding: clamp(24px, 4vw, 40px);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        background: linear-gradient(
+          135deg,
+          rgba(241, 245, 249, 0.08) 0%,
+          rgba(241, 245, 249, 0.03) 100%
+        );
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+      .chip {
+        align-self: flex-start;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 8px 16px;
+        border-radius: 999px;
+        color: white;
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary) 0%,
+          var(--accent-secondary) 100%
+        );
+        box-shadow: var(--shadow-soft);
+        text-transform: uppercase;
+      }
+      .sb-text {
+        color: var(--text-secondary);
+        line-height: 1.7;
+        font-size: 18px;
+        font-weight: 400;
+        min-height: 100px;
+      }
+      .sb-author {
+        color: var(--text-muted);
+        font-style: italic;
+        text-align: right;
+        margin-top: 8px;
+        font-size: 18px;
+      }
+      .sb-author::before {
+        content: "— ";
+      }
+      .sb-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--glass-medium);
+      }
+      .btn {
+        appearance: none;
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 12px 20px;
+        background: var(--glass-light);
+        border: 1px solid var(--glass-medium);
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(8px);
+      }
+      .btn:hover {
+        background: var(--glass-medium);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-soft);
+      }
+      .btn.primary {
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary) 0%,
+          var(--accent-secondary) 100%
+        );
+        color: white;
+        border-color: transparent;
+        box-shadow: var(--shadow-soft);
+      }
+      .btn.primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: var(--shadow-medium);
+      }
+      .btn:focus-visible {
+        outline: 2px solid var(--accent-tertiary);
+        outline-offset: 2px;
+      }
+      .close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: var(--radius-md);
+        border: 2px solid var(--glass-strong);
+        background: rgba(0, 0, 0, 0.4);
+        color: white;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        backdrop-filter: blur(12px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 10;
+      }
+      .close:hover {
+        background: rgba(0, 0, 0, 0.6);
+        transform: scale(1.1);
+        border-color: var(--accent-primary);
+      }
+
+      /* --- SECRET GREET STYLES (New Dark Theme) --- */
+      @keyframes shake {
+        10%,
+        90% {
+          transform: translate3d(-1px, 0, 0);
+        }
+        20%,
+        80% {
+          transform: translate3d(2px, 0, 0);
+        }
+        30%,
+        50%,
+        70% {
+          transform: translate3d(-4px, 0, 0);
+        }
+        40%,
+        60% {
+          transform: translate3d(4px, 0, 0);
+        }
+      }
+
+      .shake {
+        animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      }
+
+      .password-modal-content,
+      .secret-card-content {
+        position: relative;
+        background: linear-gradient(
+          145deg,
+          var(--bg-secondary),
+          var(--bg-primary)
+        );
+        padding: clamp(24px, 5vw, 40px);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--glass-medium);
+        box-shadow: var(--shadow-strong);
+        width: min(450px, 90vw);
+        text-align: center;
+      }
+      .modal-title {
+        font-size: clamp(20px, 3vw, 24px);
+        font-weight: 800;
+        margin: 0 0 8px 0;
+        color: var(--text-primary);
+      }
+      .modal-prompt {
+        color: var(--text-secondary);
+        margin: 8px 0 24px;
+      }
+      .input-group {
+        display: flex;
+        gap: 12px;
+      }
+      #passwordInput {
+        flex-grow: 1;
+        border: 2px solid var(--glass-medium);
+        background-color: var(--glass-light);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        color: var(--text-primary);
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+      #passwordInput:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+      }
+      .error-message {
+        color: var(--accent-error); /* New Error Color */
+        font-weight: 500;
+        margin-top: 16px;
+        height: 0;
+        opacity: 0;
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+      .secret-card-content {
+        width: min(500px, 90vw);
+        padding: clamp(40px, 8vw, 80px);
+      }
+      .secret-message {
+        font-size: clamp(20px, 4vw, 28px);
+        font-weight: 600;
+        font-style: italic;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        margin: 0;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+      }
+      
+      /* --- NEW: Secret Author Style --- */
+      .secret-author {
+        font-size: 18px;
+        font-style: italic;
+        color: var(--text-muted);
+        text-align: right;
+        margin-top: 24px;
+      }
+      /* --- END: SECRET GREET STYLES --- */
+    </style>
+  </head>
+  <body>
+    <div class="floating-orbs" aria-hidden="true">
+      <div class="floating-orb orb-1"></div>
+      <div class="floating-orb orb-2"></div>
+      <div class="floating-orb orb-3"></div>
+    </div>
+
+    <div class="stage" id="stage" aria-live="polite">
+      <h1>The Messages</h1>
+
+      <p class="subtitle">A special collection, just for you.</p>
+
+      <h2 class="sub-heading">Here Are Your Messages</h2>
+
+      <div class="cta-container" id="ctaContainer">
+        <button class="cta" id="beginBtn" aria-label="Begin reading messages">
+          💌 Read the Messages
+        </button>
+        <button
+          class="cta secondary"
+          id="secretGreetBtn"
+          aria-label="Open secret greeting"
+        >
+          🤫 Secret Greet
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="lightbox"
+      id="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Message viewer"
+    >
+      <div class="storybook">
+        <button class="close" id="closeLb" aria-label="Close message viewer">
+          ×
+        </button>
+        <div class="sb-msg">
+          <span class="chip" id="sbCounter">1 / 1</span>
+          <p class="sb-text" id="sbText">Message text goes here...</p>
+          <p class="sb-author" id="sbAuthor"></p>
+          <div class="sb-controls">
+            <button class="btn" id="prevBtn" aria-label="View previous message">
+              ← Previous
+            </button>
+            <button class="btn primary" id="nextBtn" aria-label="View next message">
+              Next →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="lightbox"
+      id="secretCard"
+      role="dialog"
+      aria-modal="true"
+      aria-label="A secret message"
+    >
+      <div class="secret-card-content">
+        <p class="secret-message">
+          "just wanted to tell you something… don’t stress too much about anything. Enjoy your life, your little moments, your smiles, your coffee, your walks… everything"
+        </p>
+        <p class="secret-author">— Gagan</p>
+        <button
+          class="close"
+          id="closeSecretCardBtn"
+          aria-label="Close secret message"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="lightbox"
+      id="passwordModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="passwordModalTitle"
+    >
+      <div class="password-modal-content">
+        <button
+          class="close"
+          id="closePasswordModalBtn"
+          aria-label="Close password entry"
+        >
+          ×
+        </button>
+        <h2 id="passwordModalTitle" class="modal-title">
+          Secret Access Required
+        </h2>
+        <p class="modal-prompt">
+          Please enter the password to view the secret greeting.
+        </p>
+
+        <div class="input-group">
+          <input
+            type="password"
+            id="passwordInput"
+            placeholder="Enter password..."
+          />
+          <button class="btn primary" id="submitPasswordBtn">Unlock</button>
+        </div>
+
+        <p id="passwordError" class="error-message"></p>
+      </div>
+    </div>
+
+    <script>
+      // The message data (UPDATED)
+      const memories = [
+        // Harshada
+        {
+          "text": "See I have always told you you have got that soft corner no matter what happens. I genuinely want you to shine.",
+          "author": "Harshada"
+        },
+        {
+          "text": "I’m honestly so proud of you for everything you have done, all the struggles, the internships, and how much effort you have put in for yourself and your parents.",
+          "author": "Harshada"
+        },
+        {
+          "text": "I just know you’ll do even bigger things ahead, just like your sister.",
+          "author": "Harshada"
+        },
+        {
+          "text": "I’m always here whenever you need me. Love you!!",
+          "author": "Harshada"
+        },
+        
+        // Sneha
+        {
+          "text": "Happiest Birthday Ridhaa I love u so so so much yaad hai iit bombay it's been 3 years and u are the same as we meet first...",
+          "author": "Sneha"
+        },
+        {
+          "text": "...that girl who listens to all my rants who supports me at everystage in every decision aur ha galti pr daant bhi deti hai...",
+          "author": "Sneha"
+        },
+        {
+          "text": "...and I love u for that be same and ha I m there for u hameshaaaa",
+          "author": "Sneha"
+        },
+
+        // Ramani
+        {
+          "text": "Ridhi sorry Ridhheee👀, idk how it change from Ridhii to Ridhheee! 😂 Our journey from FY to now has been CRAZY.",
+          "author": "Ramani"
+        },
+        {
+          "text": "Apne memories Fy se leke Super 30 class, our first datathon hackathon, first internship... OMG, the list is endless!🧿",
+          "author": "Ramani"
+        },
+        {
+          "text": "Kuch bhi ho apan saath mai bohut accha time spend kiye and hope so ye aisei rahe..",
+          "author": "Ramani"
+        },
+        {
+          "text": "And very important Happiest birthday Ridhheee! 🎉❤ Stay blessed, stay Happy 🥳💖, All the very Best for the future🧿🫶",
+          "author": "Ramani"
+        },
+
+        // Srivaths
+        {
+          "text": "Heyy Riddhi, its been so long time after we have. I still remember you being a part of SIh team and I got to know you after that we fostered ouor friendship under Super 30.",
+          "author": "Srivaths"
+        },
+        {
+          "text": "As a friend, I have experienced a great time, our laughing moments, and not to forget moments we helping each other.",
+          "author": "Srivaths"
+        },
+        {
+          "text": "I would never forget our friendship and I pray to God we both never forget this friendship of ours and always stay connected.",
+          "author": "Srivaths"
+        },
+        {
+          "text": "Last but not the least, wishing you a warm since alandi environment is quite chilled, and cheerful birthday to you Riddhi. I wish you succeed in the career which you seek and makes you happy 😊",
+          "author": "Srivaths"
+        },
+
+        // NEW: Akansha
+        {
+          "text": "I still can’t believe it’s been 4 years of living together — from the first day till now.",
+          "author": "Akansha"
+        },
+        {
+          "text": "Every time I needed help, especially during exams, you were always there for me without any hesitation or irritation — even when you were sleepy, you still solved my doubts patiently.",
+          "author": "Akansha"
+        },
+        {
+          "text": "Thank you for always being there, for every laugh and every moment we’ve shared. I love you so much",
+          "author": "Akansha"
+        }
+      ];
+
+      const SECRET_PASSWORD = "magic";
+
+      const elements = {
+        beginBtn: document.getElementById("beginBtn"),
+        lightbox: document.getElementById("lightbox"),
+        sbAuthor: document.getElementById("sbAuthor"),
+        sbText: document.getElementById("sbText"),
+        sbCounter: document.getElementById("sbCounter"),
+        closeLb: document.getElementById("closeLb"),
+        prevBtn: document.getElementById("prevBtn"),
+        nextBtn: document.getElementById("nextBtn"),
+        secretGreetBtn: document.getElementById("secretGreetBtn"),
+        secretCard: document.getElementById("secretCard"),
+        closeSecretCardBtn: document.getElementById("closeSecretCardBtn"),
+        passwordModal: document.getElementById("passwordModal"),
+        closePasswordModalBtn: document.getElementById("closePasswordModalBtn"),
+        passwordInput: document.getElementById("passwordInput"),
+        submitPasswordBtn: document.getElementById("submitPasswordBtn"),
+        passwordError: document.getElementById("passwordError"),
+      };
+
+      let state = {
+        currentIndex: 0,
+        isAnimating: false,
+      };
+
+      // --- LIGHTBOX FUNCTIONS ---
+
+      function openStory(index) {
+        if (state.isAnimating) return;
+        state.currentIndex = index;
+        state.isAnimating = true;
+
+        updateStorybook(); // Update text *before* showing
+        elements.lightbox.classList.add("visible");
+        trapFocus(elements.lightbox);
+
+        gsap.fromTo(
+          elements.lightbox,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.4 }
+        );
+        gsap.fromTo(
+          ".storybook",
+          { opacity: 0, scale: 0.9 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.4,
+            ease: "back.out(1.7)",
+            onComplete: () => {
+              state.isAnimating = false;
+            },
+          }
+        );
+      }
+
+      function closeStory() {
+        if (state.isAnimating) return;
+        state.isAnimating = true;
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            elements.lightbox.classList.remove("visible");
+            state.isAnimating = false;
+            releaseFocus();
+          },
+        });
+
+        tl.to(".storybook", {
+          scale: 0.95,
+          y: 20,
+          opacity: 0,
+          duration: 0.3,
+          ease: "power2.in",
+        });
+
+        tl.to(
+          elements.lightbox,
+          {
+            opacity: 0,
+            duration: 0.2,
+            ease: "power2.in",
+          },
+          0.1
+        );
+      }
+
+      function updateStorybook() {
+        const memory = memories[state.currentIndex];
+        elements.sbText.textContent = memory.text;
+        elements.sbCounter.textContent = `${state.currentIndex + 1} / ${
+          memories.length
+        }`;
+
+        if (memory.author) {
+          elements.sbAuthor.textContent = memory.author;
+          elements.sbAuthor.style.display = "block";
+        } else {
+          elements.sbAuthor.style.display = "none";
+        }
+
+        if (
+          state.isAnimating &&
+          !elements.lightbox.classList.contains("visible")
+        ) {
+          // First open, don't animate
+        } else {
+          gsap.fromTo(
+            [elements.sbText, elements.sbAuthor],
+            { y: 12, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: "power2.out" }
+          );
+        }
+        elements.prevBtn.style.opacity = state.currentIndex === 0 ? "0.5" : "1";
+        elements.nextBtn.style.opacity =
+          state.currentIndex === memories.length - 1 ? "0.5" : "1";
+      }
+
+      function nextStory() {
+        if (state.currentIndex < memories.length - 1) {
+          state.currentIndex++;
+          crossfadeStory();
+        }
+      }
+
+      function prevStory() {
+        if (state.currentIndex > 0) {
+          state.currentIndex--;
+          crossfadeStory();
+        }
+      }
+
+      function crossfadeStory(direction = 1) {
+        if (state.isAnimating) return;
+        state.isAnimating = true;
+        const xOffset = 30 * direction;
+        const tl = gsap.timeline({
+          onComplete: () => {
+            state.isAnimating = false;
+          },
+        });
+
+        tl.to([elements.sbText, elements.sbAuthor], {
+          opacity: 0,
+          x: -xOffset,
+          duration: 0.3,
+          stagger: 0.05,
+          ease: "power2.in",
+        });
+
+        tl.add(() => updateStorybook());
+
+        tl.fromTo(
+          [elements.sbText, elements.sbAuthor],
+          { opacity: 0, x: xOffset },
+          { opacity: 1, x: 0, duration: 0.4, stagger: 0.08, ease: "power2.out" }
+        );
+      }
+
+      // --- SECRET GREET FUNCTIONS ---
+
+      function openPasswordModal() {
+        if (state.isAnimating) return;
+        elements.passwordModal.classList.add("visible");
+
+        gsap.fromTo(
+          elements.passwordModal,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.3 }
+        );
+        gsap.fromTo(
+          ".password-modal-content",
+          { opacity: 0, scale: 0.9 },
+          { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }
+        );
+
+        trapFocus(elements.passwordModal);
+        elements.passwordInput.focus();
+      }
+
+      function closePasswordModal() {
+        gsap.to(".password-modal-content", {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.3,
+          ease: "power2.in",
+        });
+        gsap.to(elements.passwordModal, {
+          opacity: 0,
+          duration: 0.3,
+          delay: 0.1,
+          onComplete: () => {
+            elements.passwordModal.classList.remove("visible");
+            elements.passwordInput.value = "";
+            elements.passwordError.style.height = 0;
+            elements.passwordError.style.opacity = 0;
+            releaseFocus();
+          },
+        });
+      }
+
+      function verifyPassword() {
+        const input = elements.passwordInput.value;
+        const content = elements.passwordModal.querySelector(
+          ".password-modal-content"
+        );
+        content.classList.remove("shake");
+
+        if (input.toLowerCase() === SECRET_PASSWORD) {
+          closePasswordModal();
+          setTimeout(openSecretCard, 400); // Wait for close animation
+        } else {
+          elements.passwordError.textContent = "Incorrect password. Please try again.";
+          gsap.to(elements.passwordError, { opacity: 1, height: "auto" });
+          content.classList.add("shake");
+          elements.passwordInput.value = "";
+          elements.passwordInput.focus();
+        }
+      }
+
+      function openSecretCard() {
+        if (state.isAnimating) return;
+        state.isAnimating = true;
+
+        elements.secretCard.classList.add("visible");
+        gsap.fromTo(
+          elements.secretCard,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.4 }
+        );
+        gsap.fromTo(
+          ".secret-card-content",
+          { opacity: 0, scale: 0.9 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.4,
+            ease: "back.out(1.7)",
+            onComplete: () => {
+              state.isAnimating = false;
+            },
+          }
+        );
+
+        trapFocus(elements.secretCard);
+        elements.closeSecretCardBtn.focus();
+      }
+
+      function closeSecretCard() {
+        if (state.isAnimating) return;
+        state.isAnimating = true;
+
+        gsap.to(".secret-card-content", {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.3,
+          ease: "power2.in",
+        });
+        gsap.to(elements.secretCard, {
+          opacity: 0,
+          duration: 0.3,
+          delay: 0.1,
+          onComplete: () => {
+            elements.secretCard.classList.remove("visible");
+            state.isAnimating = false;
+            releaseFocus();
+            elements.secretGreetBtn.focus(); // Return focus
+          },
+        });
+      }
+
+      // --- ACCESSIBILITY & UTILITIES ---
+      let lastFocused = null;
+      function trapFocus(container) {
+        lastFocused = document.activeElement;
+        const focusableElements = container.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        function handleTabKey(e) {
+          if (e.key !== "Tab") return;
+          if (e.shiftKey) {
+            if (document.activeElement === firstFocusable) {
+              lastFocusable.focus();
+              e.preventDefault();
+            }
+          } else {
+            if (document.activeElement === lastFocusable) {
+              firstFocusable.focus();
+              e.preventDefault();
+            }
+          }
+        }
+        container.addEventListener("keydown", handleTabKey);
+        container._removeTabTrap = () =>
+          container.removeEventListener("keydown", handleTabKey);
+
+        if (container.id === "lightbox") {
+          elements.nextBtn.focus();
+        } else if (container.id === "passwordModal") {
+          elements.passwordInput.focus();
+        } else if (container.id === "secretCard") {
+          elements.closeSecretCardBtn.focus();
+        } else {
+          firstFocusable.focus();
+        }
+      }
+
+      function releaseFocus() {
+        if (elements.lightbox._removeTabTrap)
+          elements.lightbox._removeTabTrap();
+        if (elements.passwordModal._removeTabTrap)
+          elements.passwordModal._removeTabTrap();
+        if (elements.secretCard._removeTabTrap)
+          elements.secretCard._removeTabTrap();
+
+        if (lastFocused && lastFocused.focus) {
+          lastFocused.focus();
+          lastFocused = null;
+        }
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") {
+          if (elements.lightbox.classList.contains("visible")) {
+            switch (e.key) {
+              case "ArrowRight":
+                nextStory();
+                break;
+              case "ArrowLeft":
+                prevStory();
+                break;
+            }
+          }
+          return;
+        }
+        if (elements.lightbox.classList.contains("visible")) {
+          closeStory();
+        } else if (elements.passwordModal.classList.contains("visible")) {
+          closePasswordModal();
+        } else if (elements.secretCard.classList.contains("visible")) {
+          closeSecretCard();
+        }
+      });
+
+      // --- INITIALIZE ---
+      function initialize() {
+        elements.beginBtn.addEventListener("click", () => {
+          openStory(0);
+        });
+        elements.closeLb.addEventListener("click", closeStory);
+        elements.nextBtn.addEventListener("click", nextStory);
+        elements.prevBtn.addEventListener("click", prevStory);
+        elements.secretGreetBtn.addEventListener("click", openPasswordModal);
+        elements.closePasswordModalBtn.addEventListener(
+          "click",
+          closePasswordModal
+        );
+        elements.submitPasswordBtn.addEventListener("click", verifyPassword);
+        elements.passwordInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") verifyPassword();
+        });
+        elements.closeSecretCardBtn.addEventListener("click", closeSecretCard);
+
+        console.log("💌 Message storybook initialized successfully!");
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initialize);
+      } else {
+        initialize();
+      }
+    </script>
+  </body>
+</html>
